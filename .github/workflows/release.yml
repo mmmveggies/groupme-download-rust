@@ -40,6 +40,7 @@ jobs:
           path: artifacts
           pattern: artifact_*
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/*
+      - name: create release and upload artifacts
+        run: gh release create ${{ github.ref_name }} ./artifacts/* -p
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
