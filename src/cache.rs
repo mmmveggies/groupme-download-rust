@@ -1,8 +1,10 @@
 use std::{
     fs::{self, File},
-    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
 };
+
+#[cfg(not(windows))]
+use std::os::unix::fs::PermissionsExt;
 
 use miette::IntoDiagnostic;
 use serde::{Deserialize, Serialize};
@@ -116,7 +118,10 @@ where
         .into_diagnostic()?;
 
     let mut permissions = file.metadata().into_diagnostic()?.permissions();
+
+    #[cfg(not(windows))]
     permissions.set_mode(0o600);
+
     fs::set_permissions(filepath, permissions).into_diagnostic()?;
 
     serde_path_to_error::serialize(data, &mut serde_json::Serializer::pretty(file))

@@ -12,10 +12,13 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            filename: groupme-download-linux
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            filename: groupme-download-win.exe
           - os: macos-latest
             target: aarch64-apple-darwin
+            filename: groupme-download-mac
     steps:
       - uses: actions/checkout@v4
       - name: cargo build
@@ -23,11 +26,11 @@ jobs:
         run: |
           rustup update
           cargo build --release --target ${{ matrix.target }}
-          cp "target/${{ matrix.target }}/release/groupme-download-rust" "artifacts/${{ matrix.os }}"
+          cp "target/${{ matrix.target }}/release/groupme-download-rust" "${{ matrix.filename }}"
       - uses: actions/upload-artifact@v4
         with:
           name: "artifact_${{ matrix.os }}"
-          path: artifacts/
+          path: ${{ matrix.filename }}
   release:
     runs-on: ubuntu-latest
     needs: ["build"]
