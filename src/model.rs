@@ -109,7 +109,7 @@ pub enum MessageAttachment {
     },
     Emoji {
         placeholder: String,
-        charmap: Vec<Vec<String>>,
+        charmap: Vec<Vec<u8>>,
     },
     Reply {
         user_id: String,
