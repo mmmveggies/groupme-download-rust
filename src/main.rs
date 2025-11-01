@@ -32,7 +32,15 @@ enum Command {
     SetConfig,
 
     /// Download images (requires configuration to be set).
-    Download,
+    Download {
+        // set start date for the download, otherwise user will be prompted
+        #[arg(short, long)]
+        start: Option<NaiveDate>,
+
+        // set end date for the download, otherwise user will be prompted
+        #[arg(short, long)]
+        end: Option<NaiveDate>,
+    },
 }
 
 #[tokio::main]
@@ -51,7 +59,7 @@ async fn main() -> miette::Result<()> {
 
             println!("Your configuration has been saved, you can now download images.")
         }
-        Command::Download => {
+        Command::Download { start, end } => {
             let cache = Cache::new()?;
             let Some(config) = cache.read_config()? else {
                 miette::bail!(
@@ -89,17 +97,33 @@ async fn main() -> miette::Result<()> {
                 .collect::<HashMap<_, _>>();
 
             let now = Local::now();
-            let start_date = prompt_date(
-                "Enter a start date",
-                round_month(now, -1)
-                    .ok_or_else(|| miette::miette!("Unable to select a start date"))?,
-            )?;
+            let start_date = if let Some(start_date) = start {
+                start_date
+                    .and_time(NaiveTime::default())
+                    .and_local_timezone(Local)
+                    .earliest()
+                    .expect("Unable to select a start date")
+            } else {
+                prompt_date(
+                    "Enter a start date",
+                    round_month(now, -1)
+                        .ok_or_else(|| miette::miette!("Unable to select a start date"))?,
+                )?
+            };
 
-            let end_date = prompt_date(
-                "Enter an end date",
-                round_month(now, 0)
-                    .ok_or_else(|| miette::miette!("Unable to select an end date"))?,
-            )?;
+            let end_date = if let Some(end_date) = end {
+                end_date
+                    .and_time(NaiveTime::default())
+                    .and_local_timezone(Local)
+                    .earliest()
+                    .expect("Unable to select an end date")
+            } else {
+                prompt_date(
+                    "Enter an end date",
+                    round_month(now, 0)
+                        .ok_or_else(|| miette::miette!("Unable to select an end date"))?,
+                )?
+            };
 
             let messages = client
                 .get_messages(end_date.to_utc(), start_date.to_utc(), group.id.to_string())

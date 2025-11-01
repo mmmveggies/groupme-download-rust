@@ -128,9 +128,11 @@ impl MessageAttachment {
         }
         .as_str();
 
-        let ext = if url.contains(".jpeg.") {
+        let ext = if url.contains(".jpeg") {
             "jpeg"
-        } else if url.contains(".png.") {
+        } else if url.contains(".jpg") {
+            "jpg"
+        } else if url.contains(".png") {
             "png"
         } else if url.ends_with(".mp4") {
             "mp4"
