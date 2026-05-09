@@ -25,12 +25,12 @@ impl Cache {
         const APP_DIRNAME: &str = "groupme_downloader";
 
         let cache_dir = dirs::cache_dir()
-            .map(|dir| dir.join(APP_DIRNAME))
-            .ok_or_else(|| miette::miette!("Unable to locate user's cache directory."))?;
+            .ok_or_else(|| miette::miette!("Unable to locate user's cache directory."))?
+            .join(APP_DIRNAME);
 
         let config_dir = dirs::config_dir()
-            .map(|dir| dir.join(APP_DIRNAME))
-            .ok_or_else(|| miette::miette!("Unable to locate user's config directory."))?;
+            .ok_or_else(|| miette::miette!("Unable to locate user's config directory."))?
+            .join(APP_DIRNAME);
 
         for dir in [&cache_dir, &config_dir] {
             if !fs::exists(dir).into_diagnostic()? {

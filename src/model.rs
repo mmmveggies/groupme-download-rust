@@ -116,6 +116,8 @@ pub enum MessageAttachment {
         reply_id: String,
         base_reply_id: String,
     },
+    #[serde(other)]
+    Other,
 }
 
 impl MessageAttachment {
