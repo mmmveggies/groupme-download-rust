@@ -87,17 +87,17 @@ pub struct Message {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum MessageAttachment {
     Image {
-        url: String,
+        url: Option<String>,
     },
     LinkedImage {
-        url: String,
+        url: Option<String>,
     },
     Video {
-        url: String,
+        url: Option<String>,
         preview_url: String,
     },
     File {
-        url: String,
+        url: Option<String>,
     },
     Location {
         lat: String,
@@ -128,7 +128,7 @@ impl MessageAttachment {
             Self::Video { url, .. } => url,
             _ => return None,
         }
-        .as_str();
+        .as_ref()?;
 
         let ext = if url.contains(".jpeg") {
             "jpeg"
